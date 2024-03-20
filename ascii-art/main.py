@@ -44,9 +44,8 @@ while True:
         break
 
 for i in range(len(frames)):
-    sys.stdout.write(frames[i])
+    print(frames[i], end="\r", flush = True)
+    print("", flush = True)
     time.sleep(30/1000)
-    sys.stdout.flush()
-    print (u"{}[2J{}[;H".format(chr(27), chr(27)))
 
 video.release()
