@@ -1,11 +1,14 @@
 import cv2
 import math
+import os
+import sys
+import time
 
-MAX_WIDTH = 200
-MAX_HEIGHT = 150
 ascii_map = " .:-=+*#%@"
 
 def reduce_size(width, height):
+    MAX_WIDTH = 50
+    MAX_HEIGHT = 50
     if width > MAX_WIDTH:
         return (MAX_WIDTH, int((width * MAX_HEIGHT)/height))
     if height > MAX_HEIGHT:
@@ -15,19 +18,35 @@ def reduce_size(width, height):
 
 def gray_to_ascii(grayscale):
     percent = math.ceil((grayscale/255)*100 / 10)-1
+    if percent <= 0:
+        return " "
     return ascii_map[percent]
 
-gray = cv2.cvtColor(cv2.imread("csc.jpg"), cv2.COLOR_BGR2GRAY)
-width, height = reduce_size(gray.shape[0], gray.shape[1])
-gray = cv2.resize(gray, (width, height), interpolation= cv2.INTER_LINEAR)
+def img_to_ascii(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    width, height = reduce_size(gray.shape[0], gray.shape[1])
+    gray = cv2.resize(gray, (width, height), interpolation= cv2.INTER_LINEAR)
 
-for i in range(gray.shape[0]):
-    for j in range(gray.shape[1]):
-        print(gray_to_ascii(255 - gray[i][j]), end="")
-    print()
+    text = ""
+    for i in range(gray.shape[0]):
+        for j in range(gray.shape[1]):
+            text += (gray_to_ascii(gray[i][j]))
+        text += "\n"
+    return text
 
+video = cv2.VideoCapture("BadApple.mp4")
+frames = []
+while True:
+    ret, frame = video.read()
+    if ret == True:
+        frames.append(img_to_ascii(frame))
+    else:
+        break
 
+for i in range(len(frames)):
+    sys.stdout.write(frames[i])
+    time.sleep(30/1000)
+    sys.stdout.flush()
+    print (u"{}[2J{}[;H".format(chr(27), chr(27)))
 
-cv2.imshow("Hello", gray)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+video.release()
