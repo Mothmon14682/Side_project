@@ -1,10 +1,11 @@
 import cv2
 import math
 import os
-import sys
 import time
+import os.path
 
 ascii_map = " .:-=+*#%@"
+VIDEO_NAME = "BadApple"
 
 def reduce_size(width, height):
     MAX_WIDTH = 50
@@ -31,21 +32,33 @@ def img_to_ascii(img):
     for i in range(gray.shape[0]):
         for j in range(gray.shape[1]):
             text += (gray_to_ascii(gray[i][j]))
-        text += "\n"
+        text += "/"
     return text
 
-video = cv2.VideoCapture("BadApple.mp4")
-frames = []
-while True:
-    ret, frame = video.read()
-    if ret == True:
-        frames.append(img_to_ascii(frame))
-    else:
-        break
+def render():
+    video = cv2.VideoCapture(f"{VIDEO_NAME}.mp4")
+    frames = []
+    while True:
+        ret, frame = video.read()
+        if ret == True:
+            frames.append(img_to_ascii(frame))
+        else:
+            break
+    video.release()
+    return frames
 
-for i in range(len(frames)):
-    print(frames[i], end="\r", flush = True)
-    print("", flush = True)
-    time.sleep(30/1000)
-
-video.release()
+if os.path.exists(f"./{VIDEO_NAME}.txt"):
+    with open(f"./{VIDEO_NAME}.txt", "r") as file:
+        for i in file.readlines():
+            print(i.replace("/", "\n"), end = "\r", flush = True)
+            time.sleep(30/1000)
+else:
+    frames = render()
+    os.system("rm -rf *.txt || del *.txt")
+    with open(f"./{VIDEO_NAME}.txt", "a") as file:
+        for i in range(len(frames)):
+            print(frames[i].replace("/" , "\n"), end="\r", flush = True)
+            print("", flush = True)
+            time.sleep(30/1000)
+            file.write(frames[i])
+            file.write("\n")
