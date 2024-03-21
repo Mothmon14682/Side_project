@@ -3,6 +3,8 @@ import math
 import os
 import time
 import os.path
+from playsound import playsound
+import threading
 
 ascii_map = " .:-=+*#%@"
 VIDEO_NAME = "BadApple"
@@ -49,16 +51,18 @@ def render():
 
 if os.path.exists(f"./{VIDEO_NAME}.txt"):
     with open(f"./{VIDEO_NAME}.txt", "r") as file:
+        threading.Thread(target = playsound, args = ("/home/mothmon/Code/Python/Side_project/ascii-art/BadApple.mp3",)).start()
         for i in file.readlines():
             print(i.replace("/", "\n"), end = "\r", flush = True)
-            time.sleep(30/1000)
+            time.sleep(33.15/1000)
 else:
     frames = render()
     os.system("rm -rf *.txt || del *.txt")
     with open(f"./{VIDEO_NAME}.txt", "a") as file:
+        threading.Thread(target = playsound, args = ("/home/mothmon/Code/Python/Side_project/ascii-art/BadApple.mp3",)).start()
         for i in range(len(frames)):
             print(frames[i].replace("/" , "\n"), end="\r", flush = True)
             print("", flush = True)
-            time.sleep(30/1000)
+            time.sleep(33.15/1000)
             file.write(frames[i])
             file.write("\n")
